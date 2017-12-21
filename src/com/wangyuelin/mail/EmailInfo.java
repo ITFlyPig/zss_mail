@@ -1,7 +1,6 @@
 package com.wangyuelin.mail;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class EmailInfo implements Serializable {
 	/**
@@ -22,5 +21,6 @@ public class EmailInfo implements Serializable {
 	
 	public boolean isSendSuccess;//邮件是否发送成功
 	public boolean isCreateExcelSuc;//创建Excel文件是否成功
+	public String zipFileName;//压缩文件的路径
 
 }

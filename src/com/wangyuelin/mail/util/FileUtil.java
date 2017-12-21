@@ -16,6 +16,8 @@ import java.util.Properties;
 public class FileUtil {
     private static final String TAG = "FileUtil";
 
+    private static int ZIP_SIZE = 2 * 1024 * 1024;//文件大小超过2M就进行压缩
+
     /**
      * 解析属性文件
      */
@@ -113,7 +115,7 @@ public class FileUtil {
             emailInfo.sql = readTxtFile(file.getAbsolutePath());//等地啊解析
             emailInfo.executeTime = Util.getTimeByDate(Config.sendTime);
             emailInfo.sendTime = Util.getTimeByDate(Config.sendTime);
-            emailInfo.reaultFileName = getFileName(emailInfo.sqlFile);
+            emailInfo.reaultFileName = getFileName(emailInfo.sqlFile) + ".xls";
             Config.addUnhandleEmailInfo(emailInfo);
             Log.MyLog(TAG, file.getAbsolutePath() + "  解析SQL文件得到的sql语句：" + emailInfo.sql +" \n");
         }
@@ -132,7 +134,7 @@ public class FileUtil {
         emailInfo.sql = sql;
         emailInfo.executeTime = Util.getTimeByDate(Config.sendTime);
         emailInfo.sendTime = Util.getTimeByDate(Config.sendTime);
-        emailInfo.reaultFileName = getFileName(emailInfo.sqlFile);
+        emailInfo.reaultFileName = getFileName(emailInfo.sqlFile) +  ".xls";
         return emailInfo;
     }
 
@@ -160,16 +162,49 @@ public class FileUtil {
         return result.toString();
     }
 
+
     /**
-     * 据文件的路劲得到文件的名称
+     * 判断文件是否应该进行压缩
      * @param path
+     * @param fileName
+     * @return
+     */
+    public static boolean shouldZIP(String path, String fileName){
+        if (TextUtil.isEmpty(path) || TextUtil.isEmpty(fileName)){
+            return false;
+        }
+        File file = new File(path + File.separator + fileName);
+        if (file.exists() && file.isFile() && (file.length() > ZIP_SIZE) ){
+            return true;
+
+        }
+        return false;
+    }
+
+
+
+    /**
+     * 得到文件的名称
+     * @param path 可以使绝对路径，也可以是只有文件名
      * @return
      */
     public static String getFileName(String path){
+        String fileName ="";
         if (TextUtil.isEmpty(path)){
-            return System.currentTimeMillis() + "";
+            fileName = System.currentTimeMillis() + "";
+            return fileName;
         }
-        return path.substring(path.lastIndexOf(File.separator) + 1, path.lastIndexOf(".") ) + ".xls";
+
+        if (path.contains(File.separator)){//表示是路径
+            fileName  = path.substring(path.lastIndexOf(File.separator) + 1);
+
+        }else {
+            fileName = path;
+        }
+        if (!TextUtil.isEmpty(fileName)){
+           fileName = fileName.substring(0, fileName.lastIndexOf("."));
+        }
+        return fileName;
 
     }
 

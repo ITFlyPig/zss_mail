@@ -6,11 +6,9 @@ import com.wangyuelin.mail.conf.Config;
 import com.wangyuelin.mail.conf.FileConfig;
 import com.wangyuelin.mail.db.DbItf;
 import com.wangyuelin.mail.db.MySqlDb;
-import com.wangyuelin.mail.util.EmailUtil;
-import com.wangyuelin.mail.util.ExcelUtil;
-import com.wangyuelin.mail.util.TextUtil;
-import com.wangyuelin.mail.util.Util;
+import com.wangyuelin.mail.util.*;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -43,6 +41,16 @@ public class SqlTask implements Runnable {
 				Log.MyLog(TAG, "开始创建Excel文件");
 				boolean success = ExcelUtil.createExcel(FileConfig.CACHE_DIR, task.reaultFileName, result);//创建文件
 				task.isCreateExcelSuc = success;
+				//文件太大就压缩
+				if(task.isCreateExcelSuc && FileUtil.shouldZIP(FileConfig.CACHE_DIR, task.reaultFileName)){
+					File srcFile = new File(FileConfig.CACHE_DIR + File.separator + task.reaultFileName);
+					File[] files = new File[]{srcFile};
+
+					String zipName = FileUtil.getFileName(task.reaultFileName) + ".zip";
+					String zipPath = FileConfig.CACHE_DIR + File.separator + zipName;
+					ZipFileUtil.compressFiles2Zip(files, zipPath);
+					task.zipFileName = zipName;
+				}
 
 				Log.MyLog(TAG, "开始添加到处理完成队列");
 				Config.addHandleEmailInfo(task);
@@ -72,18 +80,5 @@ public class SqlTask implements Runnable {
 		return true;
 	}
 	
-	/**
-	 * 查询的结果，是立即发送还是缓存
-	 */
-	private void handleSendOrCache(EmailInfo task){
-		if(Util.shouldSendEmail(task)){//发送邮件
-		boolean result = EmailUtil.sendAttachmentEmail(task.reaultFilePath, task.reaultFileName,task.subject, task.content,  Config.receiveEmails);//发送邮件
-		task.isSendSuccess = result;//记录邮件的发送结果
-		EmailUtil.sendMail(Config.errorSubscriberEmail, "邮件发送结果", task.sqlFile + "对应的邮件发送成功与否：" + result);
-		}else {//缓存执行的结果,在任务执行完的时候缓存
-
-		}
-
-	}
 
 }

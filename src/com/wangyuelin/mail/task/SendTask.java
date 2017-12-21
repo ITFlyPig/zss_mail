@@ -5,6 +5,9 @@ import com.wangyuelin.mail.Log;
 import com.wangyuelin.mail.conf.Config;
 import com.wangyuelin.mail.conf.FileConfig;
 import com.wangyuelin.mail.util.EmailUtil;
+import com.wangyuelin.mail.util.TextUtil;
+
+import java.io.File;
 
 /**
  * Created by wangyuelin on 2017/12/19.
@@ -21,11 +24,27 @@ public class SendTask implements Runnable {
             Log.MyLog(TAG, "开始发送邮件的任务");
             EmailInfo emailInfo = Config.getOneHandleEmail();
             Log.MyLog(TAG, "开始发送邮件的任务：" + emailInfo.sqlFile);
-                boolean result = EmailUtil.sendAttachmentEmail(FileConfig.CACHE_DIR, emailInfo.reaultFileName,emailInfo.subject, emailInfo.content,  Config.receiveEmails);//发送邮件
-                emailInfo.isSendSuccess = result;//记录邮件的发送结果
-                Log.MyLog(TAG, "邮件发送的结果：" + emailInfo.isSendSuccess);
+            String fileName = "";
 
-//            checkExits();
+            //判断压缩文件是否存在和文件大小是否大于0
+
+            if (!TextUtil.isEmpty(emailInfo.zipFileName)){
+                File zipFile = new File(FileConfig.CACHE_DIR + File.separator + emailInfo.zipFileName);
+                if (zipFile.exists() && zipFile.length() > 0){
+                    fileName = emailInfo.zipFileName;
+                }
+            }
+
+            if (TextUtil.isEmpty(fileName)){
+                fileName = emailInfo.reaultFileName;
+
+            }
+            boolean result = EmailUtil.sendAttachmentEmail(FileConfig.CACHE_DIR, fileName, emailInfo.subject, emailInfo.content,  Config.receiveEmails);//发送邮件
+
+            emailInfo.isSendSuccess = result;//记录邮件的发送结果
+            Log.MyLog(TAG, "邮件发送的结果：" + emailInfo.isSendSuccess);
+
+//           checkExits();
 
         }
     }

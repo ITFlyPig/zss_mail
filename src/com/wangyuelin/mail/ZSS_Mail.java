@@ -100,8 +100,7 @@ public class ZSS_Mail {
     	mailTest.initConfig();
     	mailTest.clearPreCacheFile();
     	mailTest.execute();
-    	
-     
+
     }  
     
     /**
@@ -155,29 +154,7 @@ public class ZSS_Mail {
     	//还要新开一个线程，检查哪些已经查询完毕的就发送
     }
     
-    /**
-     * 正式执行之前
-     */
-    private void preExecute(){
-    	//将sql执行成功并且Excel创建完成缓存的邮件且在本次解析得到任务中的邮件发送了，留下没有成功的后续处理，这种考虑主要是因为第二次进入系统和第一次进入系统读取到的配置文件可能不一样
-    	List<EmailInfo> cacheList = (List<EmailInfo>) Util.readObjectFromFile();
-    	if(cacheList == null || cacheList.size() == 0){
-    		return;
-    	}
-    	
-    	for (int i = 0; i < Config.emailTasks.size(); i++) {
-    		EmailInfo nowTask =  Config.emailTasks.get(i);
-    		getInfoByCachedInfo(nowTask,cacheList);
-    		if(Util.shouldSendEmail(nowTask) ){
-    			boolean result = EmailUtil.sendAttachmentEmail(nowTask.reaultFilePath, nowTask.reaultFileName,nowTask.subject, nowTask.content,  Config.receiveEmails);//发送邮件
-    			nowTask.isSendSuccess = result;//记录邮件的发送结果
-    		}
-			
-		}
-    	
-    	
-    }
-    
+
     /**
      * 每次进来的初始化方法，解析读取配置文件
      */

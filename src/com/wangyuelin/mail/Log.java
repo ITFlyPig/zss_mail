@@ -16,14 +16,4 @@ public class Log {
 		System.out.println(tag + ": " + text);
 	}
 	
-	/**
-	 * 将错误发送给订阅者，方便及时处理错误
-	 * @param error
-	 */
-	public static void sendErrorLog(String error){
-		
-		
-	}
-	
-
 }

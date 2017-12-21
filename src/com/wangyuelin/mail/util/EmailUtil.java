@@ -113,8 +113,10 @@ public class EmailUtil {
     public static void sendMail(String toAddress, String subject, String content){
         loadConfg(FileConfig.MAIL_FILE);
         Email email = new SimpleEmail();
+        email.setDebug(true);
+        email.setCharset("utf-8");
         email.setHostName(SMTP_ADDRESS);
-        email.setAuthentication(USER_NAME, PASSWORD);
+        email.setAuthenticator(new DefaultAuthenticator(USER_NAME, PASSWORD));
         //email.setSSLOnConnect(true);
         //        email.setSSL(true);//commons-mail-1.1支持的方法，1.4中使用setSSLOnConnect(true)代替
         try {
@@ -123,6 +125,7 @@ public class EmailUtil {
             email.setMsg(content);
             email.addTo(toAddress);
             email.send();
+            Log.MyLog(TAG, "邮件发送成功，接收人：" + toAddress);
         } catch (EmailException e) {
             Log.MyLog(TAG, e.getLocalizedMessage());
             e.printStackTrace();

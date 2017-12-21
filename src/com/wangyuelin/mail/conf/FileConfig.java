@@ -19,6 +19,7 @@ public class FileConfig {
 	public static String MAIL_FILE = CONF_DIR + File.separator + "mail_conf.properties";//邮件的配置文件的路劲
 
 	public static String CACHE_DIR = "./cache";
+	public static String ZIP_DIR = "./zip";//zip文件存放的路径
 	
 
 
